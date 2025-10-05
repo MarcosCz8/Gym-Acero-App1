@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Cliente-Pago</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.9));
+            color: white;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        h1 {
+            color: orangered;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 95%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background: #222;
+            color: white;
+        }
+
+        th, td {
+            border: 1px solid #444;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background: #111;
+            color: orange;
+        }
+
+        tr:nth-child(even) {
+            background: #333;
+        }
+
+        tr:hover {
+            background: #444;
+        }
+    </style>
+</head>
+<body>
+    <h1>Historial de Cliente-Pago</h1>
+    <table id="tablaPagos">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Clase</th>
+                <th>Grupo</th>
+                <th>Forma de Pago</th>
+                <th>Monto</th>
+                <th>Fecha</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+    async function cargarHistorial() {
+      try {
+        const response = await fetch("http://localhost:3000/historial-pagos");
+        const data = await response.json();
+        const tbody = document.querySelector("#tablaPagos tbody");
+        tbody.innerHTML = "";
+
+        data.forEach(item => {
+          const fila = `
+            <tr>
+              <td>${item.nombre}</td>
+              <td>${item.apellido}</td>
+              <td>${item.clase}</td>
+              <td>${item.grupo}</td>
+              <td>${item.forma_de_pago}</td>
+              <td>$${item.monto}</td>
+              <td>${new Date(item.fecha).toLocaleDateString()}</td>
+            </tr>
+          `;
+          tbody.innerHTML += fila;
+        });
+      } catch (err) {
+        console.error("Error cargando historial:", err);
+      }
+    }
+
+    // Ejecutar automáticamente al cargar la página
+    cargarHistorial();
+    </script>
+</body>
+</html>

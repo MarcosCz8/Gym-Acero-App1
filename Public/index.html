@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Cliente - Gym Acero</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.75)), url('fondo-gym.jpg') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #fff;
+        }
+
+        .container {
+            background: rgba(20,20,20,0.95);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 0 25px rgba(255, 69, 0, 0.6);
+            color: #fff;
+            opacity: 0;
+            transform: translateY(-30px);
+            animation: fadeInUp 1s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            text-align: center;
+            color: #ff4500;
+            margin-bottom: 20px;
+            font-family: 'Verdana', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #ffa500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 5px;
+            border: 2px solid #ff4500;
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            background: #1e1e1e;
+            color: #fff;
+            font-size: 15px;
+        }
+
+            input:hover, select:hover {
+                border-color: #ffa500;
+                box-shadow: 0 0 10px #ff4500;
+            }
+
+            input:focus, select:focus {
+                border-color: #ffa500;
+                box-shadow: 0 0 15px #ff8c00;
+                outline: none;
+            }
+
+        button {
+            margin-top: 25px;
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(90deg, #ff4500, #ff8c00);
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+            button:hover {
+                transform: scale(1.05);
+                background: linear-gradient(90deg, #ff8c00, #ff4500);
+                box-shadow: 0 0 20px #ff8c00;
+            }
+
+            button::after {
+                content: "";
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: rgba(255, 255, 255, 0.15);
+                transform: rotate(25deg);
+                animation: shine 3s infinite;
+            }
+
+        @keyframes shine {
+            0% {
+                transform: translateX(-100%) rotate(25deg);
+            }
+
+            100% {
+                transform: translateX(100%) rotate(25deg);
+            }
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            display: none;
+        }
+
+        .success {
+            background: #28a745;
+            color: #fff;
+        }
+
+        .error {
+            background: #dc3545;
+            color: #fff;
+        }
+
+        @media(max-width: 550px) {
+            .container {
+                padding: 20px;
+            }
+
+            button {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="botones">
+        <h1>Registrar Cliente</h1>
+        <form id="registroForm">
+            <label>Nombre:</label>
+            <input type="text" name="nombre" required>
+
+            <label>Apellido:</label>
+            <input type="text" name="apellido" required>
+
+            <label>Email:</label>
+            <input type="email" name="email" required>
+
+            <label>Fecha de Nacimiento:</label>
+            <input type="date" name="fecha_nac" required>
+
+            <label>Género:</label>
+            <select name="genero" required>
+                <option value="">Seleccione</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Femenino">Femenino</option>
+                <option value="Otro">Otro</option>
+            </select>
+
+            <label>ID Clase:</label>
+            <input type="number" name="id_clase" min="1" required>
+
+            <label>ID Grupo:</label>
+            <input type="number" name="id_grupo" min="1" required>
+
+
+            <label>Forma de Pago:</label>
+            <input type="text" name="forma_pago" required>
+
+            <label>Monto:</label>
+            <input type="number" name="monto" min="0" required>
+
+            <button type="submit">Registrar</button>
+            <button type="button" onclick="window.location.href='/pagos.html'">Historial Pagos</button>
+            
+        </form>
+
+        <div id="resultado" class="message"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('registroForm');
+        const resultado = document.getElementById('resultado');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            resultado.style.display = 'none';
+            resultado.className = 'message';
+
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            data.monto = Number(data.monto);
+
+            try {
+                const res = await fetch('/registrar-cliente', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const json = await res.json();
+
+                if (res.ok) {
+                    resultado.textContent = json.message;
+                    resultado.classList.add('success');
+                    resultado.style.display = 'block';
+                    form.reset();
+                } else {
+                    resultado.textContent = json.error || '❌ Error desconocido';
+                    resultado.classList.add('error');
+                    resultado.style.display = 'block';
+                }
+            } catch (err) {
+                resultado.textContent = '❌ Error al enviar los datos';
+                resultado.classList.add('error');
+                resultado.style.display = 'block';
+                console.error(err);
+            }
+        });
+    </script>
+</body>
+</html>
